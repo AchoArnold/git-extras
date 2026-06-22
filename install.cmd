@@ -38,8 +38,22 @@ goto :defaultpath
 :break
 rem remove the last slash
 SET bindir=%bindir:~0,-1%
-for %%G in ("%bindir%") do set installdir=%%~dpG
-set PREFIX=%installdir%mingw64
+for %%G in ("%bindir%") do (
+    set installdir=%%~dpG
+    set bindirname=%%~nxG
+)
+if /I "%bindirname%"=="bin" (
+    for %%H in ("%installdir:~0,-1%") do set archdir=%%~nxH
+    if /I "!archdir!"=="mingw64" (
+        set PREFIX=%installdir:~0,-1%
+    ) else if /I "!archdir!"=="clangarm64" (
+        set PREFIX=%installdir:~0,-1%
+    ) else (
+        set PREFIX=%installdir%mingw64
+    )
+) else (
+    set PREFIX=%installdir%mingw64
+)
 goto :foundprefix
 
 :defaultpath
