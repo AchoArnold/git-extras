@@ -90,13 +90,15 @@ set GIT_INSTALL_DIR=!GIT_INSTALL_DIR:"=!
 IF %GIT_INSTALL_DIR:~-1%==\ SET GIT_INSTALL_DIR=%GIT_INSTALL_DIR:~0,-1%
 
 rem both architecture directories must be missing before showing this error
-if not exist "%GIT_INSTALL_DIR%\mingw64" if not exist "%GIT_INSTALL_DIR%\clangarm64" (
-    echo No mingw64 or clangarm64 folder found in %GIT_INSTALL_DIR%.
-    echo.
-    echo Please supply a proper "Git for Windows 2.x" install path:
-    echo "install.cmd c:\[git-install-path]"
-    set ERROR=1
-    goto :exit
+if not exist "%GIT_INSTALL_DIR%\mingw64" (
+    if not exist "%GIT_INSTALL_DIR%\clangarm64" (
+        echo No mingw64 or clangarm64 folder found in %GIT_INSTALL_DIR%.
+        echo.
+        echo Please supply a proper "Git for Windows 2.x" install path:
+        echo "install.cmd c:\[git-install-path]"
+        set ERROR=1
+        goto :exit
+    )
 )
 
 echo Installing to %PREFIX%
