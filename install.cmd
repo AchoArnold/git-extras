@@ -55,9 +55,11 @@ IF NOT "%~1"=="" (
     REM just supplying the git dir is enough...
     if exist "%~1\mingw64" (
         set PREFIX=%~1\mingw64
+    ) else if exist "%~1\clangarm64" (
+        set PREFIX=%~1\clangarm64
     ) else (
         echo Using git install path "%~1" as PREFIX, please make sure it's really a
-        echo path to the mingw64 directory...
+        echo path to the mingw64 or clangarm64 directory...
         echo.
         SET PREFIX=%~1
     )
@@ -71,8 +73,8 @@ for %%H in ("%PREFIX%") do set GIT_INSTALL_DIR=%%~dpH
 set GIT_INSTALL_DIR=!GIT_INSTALL_DIR:"=!
 IF %GIT_INSTALL_DIR:~-1%==\ SET GIT_INSTALL_DIR=%GIT_INSTALL_DIR:~0,-1%
 
-if not exist "%GIT_INSTALL_DIR%\mingw64" (
-    echo No mingw64 folder found in %GIT_INSTALL_DIR%.
+if not exist "%GIT_INSTALL_DIR%\mingw64" if not exist "%GIT_INSTALL_DIR%\clangarm64" (
+    echo No mingw64 or clangarm64 folder found in %GIT_INSTALL_DIR%.
     echo.
     echo Please supply a proper "Git for Windows 2.x" install path:
     echo "install.cmd c:\[git-install-path]"
