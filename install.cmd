@@ -44,13 +44,11 @@ for %%G in ("%bindir%") do (
 )
 if /I "!bindirname!"=="bin" (
     for %%H in ("%installdir:~0,-1%") do set archdir=%%~nxH
-    if /I "!archdir!"=="mingw64" (
-        set PREFIX=%installdir:~0,-1%
-    ) else if /I "!archdir!"=="clangarm64" (
-        set PREFIX=%installdir:~0,-1%
-    ) else (
-        rem fall back to historical default when auto-detected path is not architecture-scoped
+    if /I not "!archdir!"=="mingw64" if /I not "!archdir!"=="clangarm64" (
+        rem fall back to historical default when auto-detected path is not architecture-specific
         set PREFIX=%installdir%mingw64
+    ) else (
+        set PREFIX=%installdir:~0,-1%
     )
 ) else (
     rem non-bin layouts keep the legacy mingw64 default prefix behavior
