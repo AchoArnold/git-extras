@@ -42,11 +42,11 @@ for %%G in ("%bindir%") do (
     set installdir=%%~dpG
     set bindirname=%%~nxG
 )
-for %%H in ("%installdir:~0,-1%") do set archdir=%%~nxH
+for %%H in ("%installdir:~0,-1%") do set installdirname=%%~nxH
 if /I "%bindirname%"=="bin" (
-    if /I "%archdir%"=="mingw64" (
+    if /I "%installdirname%"=="mingw64" (
         set PREFIX=%installdir:~0,-1%
-    ) else if /I "%archdir%"=="clangarm64" (
+    ) else if /I "%installdirname%"=="clangarm64" (
         set PREFIX=%installdir:~0,-1%
     ) else (
         rem fall back to historical default when auto-detected path is not architecture-specific
