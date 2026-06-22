@@ -49,9 +49,11 @@ if /I "!bindirname!"=="bin" (
     ) else if /I "!archdir!"=="clangarm64" (
         set PREFIX=%installdir:~0,-1%
     ) else (
+        rem fall back to historical default when auto-detected path is not architecture-scoped
         set PREFIX=%installdir%mingw64
     )
 ) else (
+    rem non-bin layouts keep the legacy mingw64 default prefix behavior
     set PREFIX=%installdir%mingw64
 )
 goto :foundprefix
@@ -87,6 +89,7 @@ for %%H in ("%PREFIX%") do set GIT_INSTALL_DIR=%%~dpH
 set GIT_INSTALL_DIR=!GIT_INSTALL_DIR:"=!
 IF %GIT_INSTALL_DIR:~-1%==\ SET GIT_INSTALL_DIR=%GIT_INSTALL_DIR:~0,-1%
 
+rem both architecture directories must be missing before showing this error
 if not exist "%GIT_INSTALL_DIR%\mingw64" if not exist "%GIT_INSTALL_DIR%\clangarm64" (
     echo No mingw64 or clangarm64 folder found in %GIT_INSTALL_DIR%.
     echo.
