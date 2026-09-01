@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-import re
-import os
 import argparse
+import os
+import re
+import sys
+from collections.abc import Callable  # compat
 from pathlib import Path
-from typing import Callable, List, Dict, Any # compat
+from typing import Any
 
 # This file checks Bash and Shell scripts for violations not found with
 # shellcheck or existing methods. You can use it in several ways:
@@ -21,7 +23,7 @@ from typing import Callable, List, Dict, Any # compat
 # Check to ensure all regular expressions are working as intended:
 # $ ./scripts/checkstyle.py --internal-test-regex
 
-Rule = Dict[str, Any]
+Rule = dict[str, Any]
 
 class c:
     RED = '\033[91m'
@@ -91,7 +93,7 @@ def noVerboseRedirectionFixer(line: str, m: Any) -> str:
 
     return f'{prestr}&>/dev/null{poststr}'
 
-def lintfile(file: Path, rules: List[Rule], options: Dict[str, Any]):
+def lintfile(file: Path, rules: list[Rule], options: dict[str, Any]):
     content_arr = file.read_text().split('\n')
 
     for line_i, line in enumerate(content_arr):
@@ -100,15 +102,15 @@ def lintfile(file: Path, rules: List[Rule], options: Dict[str, Any]):
 
         for rule in rules:
             should_run = False
-            if 'sh' in rule['fileTypes']:
-                if file.name.endswith('.sh'):
-                    should_run = True
-            if 'bash' in rule['fileTypes']:
-                if file.name.endswith('.bash') or file.name.endswith('.bats') or file.name.startswith('git-'):
-                    should_run = True
+            if 'sh' in rule['fileTypes'] and file.name.endswith('.sh'):
+                should_run = True
+            if 'bash' in rule['fileTypes'] and (
+                file.name.endswith('.bash') or file.name.endswith('.bats') or file.name.startswith('git-')
+            ):
+                should_run = True
 
             if options['verbose']:
-                print(f'{str(file)}: {should_run}')
+                print(f'{file!s}: {should_run}')
 
             if not should_run:
                 continue
@@ -134,7 +136,7 @@ def lintfile(file: Path, rules: List[Rule], options: Dict[str, Any]):
         file.write_text('\n'.join(content_arr))
 
 def main():
-    rules: List[Rule] = [
+    rules: list[Rule] = [
         {
             'name': 'no-pwd-capture',
             'regex': '(?P<match>\\$\\(pwd\\))',
@@ -238,7 +240,12 @@ def main():
                 lintfile(p, rules, options)
     else:
         for file in Path.cwd().glob('**/*'):
-            if '.git' in str(file.absolute()):
+            skip = False
+            for name in ('.git', 'vendor', '__pycache__'):
+                if name in str(file.absolute()):
+                    skip = True
+                    break
+            if skip:
                 continue
 
             if file.is_file():
@@ -255,8 +262,8 @@ def main():
 
     # exit
     if grand_total == 0:
-        exit(0)
+        sys.exit(0)
     else:
-        exit(2)
+        sys.exit(2)
 
 main()
